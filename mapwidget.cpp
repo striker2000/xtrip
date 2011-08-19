@@ -8,6 +8,7 @@ MapWidget::MapWidget(QWidget *parent) :
     m_tiles = new TilesMap(m_center, m_zoom, this);
     connect(m_tiles, SIGNAL(updated(QRect)), SLOT(updateMap(QRect)));
     connect(m_tiles, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
+    connect(m_tiles, SIGNAL(zoomChanged(int)), SIGNAL(zoomChanged(int)));
     m_lockWheel = false;
 }
 
@@ -30,15 +31,11 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
         case Qt::Key_PageUp:
-            m_zoom++;
-            m_tiles->setZoom(m_zoom);
-            emit zoomChanged(m_zoom);
+            m_zoom = m_tiles->setZoom(m_zoom + 1);
             update();
             break;
         case Qt::Key_PageDown:
-            m_zoom--;
-            m_tiles->setZoom(m_zoom);
-            emit zoomChanged(m_zoom);
+            m_zoom = m_tiles->setZoom(m_zoom - 1);
             update();
             break;
         case Qt::Key_O:
@@ -83,8 +80,7 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     m_zoom += event->delta() / 120;
     m_center = pointToLatLon(latLonToPoint(pos) - delta);
     m_tiles->setCenter(m_center);
-    m_tiles->setZoom(m_zoom);
-    emit zoomChanged(m_zoom);
+    m_zoom = m_tiles->setZoom(m_zoom);
     update();
 
     m_lockWheel = true;

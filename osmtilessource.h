@@ -15,6 +15,7 @@ public:
         return QString("http://tile.openstreetmap.org/%1/%2/%3.png")
                 .arg(zoom).arg(x).arg(y);
     }
+    int maxZoom() { return 18; }
 };
 
 #endif // OSMTILESSOURCE_H

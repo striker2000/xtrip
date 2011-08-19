@@ -21,13 +21,14 @@ class TilesMap : public QWidget
 public:
     explicit TilesMap(LatLon center, int zoom, QWidget *parent = 0);
     void setCenter(LatLon center);
-    void setZoom(int zoom);
+    int setZoom(int zoom);
     void setSource(QString source);
     void loadTiles();
 
 signals:
     void updated(const QRect &rect);
     void tilesLoading(int count);
+    void zoomChanged(int zoom);
 
 public slots:
     void updateTile(QPoint tp);

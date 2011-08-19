@@ -8,9 +8,7 @@ public:
     virtual QString dirname() = 0;
     virtual QString format() = 0;
     virtual QString tileUrl(int x, int y, int zoom) = 0;
-
-protected:
-    QString m_url;
+    virtual int maxZoom() = 0;
 };
 
 #endif // TILESSOURCE_H

@@ -19,11 +19,21 @@ void TilesMap::setCenter(LatLon center)
     calcTilesRect();
 }
 
-void TilesMap::setZoom(int zoom)
+int TilesMap::setZoom(int zoom)
 {
-    m_zoom = zoom;
-    calcTilesRect();
-    loadTiles();
+    if (zoom < 0) {
+        zoom = 0;
+    }
+    else if (zoom > m_source->maxZoom()) {
+        zoom = m_source->maxZoom();
+    }
+    if (zoom != m_zoom) {
+        m_zoom = zoom;
+        emit zoomChanged(m_zoom);
+        calcTilesRect();
+        loadTiles();
+    }
+    return m_zoom;
 }
 
 void TilesMap::setSource(QString source)
