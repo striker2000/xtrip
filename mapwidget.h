@@ -15,6 +15,10 @@ class MapWidget : public QWidget
 
 public:
     explicit MapWidget(QWidget *parent = 0);
+    int zoom();
+
+signals:
+    void zoomChanged(int zoom);
 
 private slots:
     void updateMap(const QRect &r);

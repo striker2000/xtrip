@@ -10,6 +10,11 @@ MapWidget::MapWidget(QWidget *parent) :
     m_lockWheel = false;
 }
 
+int MapWidget::zoom()
+{
+    return m_zoom;
+}
+
 void MapWidget::updateMap(const QRect &r)
 {
     update(r);
@@ -26,11 +31,13 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
         case Qt::Key_PageUp:
             m_zoom++;
             m_tiles->setZoom(m_zoom);
+            emit zoomChanged(m_zoom);
             update();
             break;
         case Qt::Key_PageDown:
             m_zoom--;
             m_tiles->setZoom(m_zoom);
+            emit zoomChanged(m_zoom);
             update();
             break;
         case Qt::Key_O:
@@ -74,9 +81,9 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     LatLon pos = pointToLatLon(latLonToPoint(m_center) + delta);
     m_zoom += event->delta() / 120;
     m_center = pointToLatLon(latLonToPoint(pos) - delta);
-
     m_tiles->setCenter(m_center);
     m_tiles->setZoom(m_zoom);
+    emit zoomChanged(m_zoom);
     update();
 
     m_lockWheel = true;
