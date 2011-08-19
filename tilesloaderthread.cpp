@@ -5,6 +5,7 @@ TilesLoaderThread::TilesLoaderThread(QObject *parent) :
 {
     QSettings settings(QCoreApplication::applicationDirPath() + "/xtrip.ini", QSettings::IniFormat);
     m_tilesPath = settings.value("TilesPath").toString();
+    m_tileLifetime = settings.value("TileLifetime").toInt();
     m_abort = false;
     start();
 }
@@ -69,6 +70,7 @@ void TilesLoaderThread::run()
             continue;
         }
 
+        QDateTime expiration = QDateTime::currentDateTime().addDays(-m_tileLifetime);
         foreach (QPoint tp, tiles) {
             QFile file(tilePath(source->dirname(), zoom, tp, source->format()));
             if (file.open(QIODevice::ReadOnly)) {
@@ -81,23 +83,27 @@ void TilesLoaderThread::run()
                     if (QPixmapCache::insert(key, tile)) {
                         emit tileLoaded(tp);
                     }
+                    QFileInfo info(file);
+                    if (info.lastModified() >= expiration) {
+                        continue;
+                    }
                 }
             }
-            else {
-                QUrl url = QUrl(source->tileUrl(tp.x(), tp.y(), zoom));
-                QNetworkRequest request;
-                request.setUrl(url);
-                QHash<QString, QVariant> data;
-                data["tp"] = tp;
-                data["key"] = QString("tile.%1.%2.%3.%4")
-                        .arg(source->id()).arg(zoom).arg(tp.x()).arg(tp.y());
-                data["dirname"] = dirPath(source->dirname(), zoom, tp);
-                data["filename"] = tilePath(source->dirname(), zoom, tp, source->format());
-                request.setAttribute(QNetworkRequest::User, QVariant(data));
-                m_mutex.lock();
-                m_tilesQueue.enqueue(request);
-                m_mutex.unlock();
-            }
+
+            QUrl url = QUrl(source->tileUrl(tp.x(), tp.y(), zoom));
+            QNetworkRequest request;
+            request.setUrl(url);
+            QHash<QString, QVariant> data;
+            data["tp"] = tp;
+            data["key"] = QString("tile.%1.%2.%3.%4")
+                    .arg(source->id()).arg(zoom).arg(tp.x()).arg(tp.y());
+            data["dirname"] = dirPath(source->dirname(), zoom, tp);
+            data["filename"] = tilePath(source->dirname(), zoom, tp, source->format());
+            request.setAttribute(QNetworkRequest::User, QVariant(data));
+            m_mutex.lock();
+            m_tilesQueue.enqueue(request);
+            m_mutex.unlock();
+
             if (m_restart) {
                 break;
             }

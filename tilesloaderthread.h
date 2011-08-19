@@ -2,6 +2,7 @@
 #define TILESLOADERTHREAD_H
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QMutex>
@@ -45,6 +46,7 @@ private:
     QUrl m_url;
     QList<QNetworkReply *> m_replies;
     QQueue<QNetworkRequest> m_tilesQueue;
+    int m_tileLifetime;
 
     void loadNextTile();
     QString dirPath(const QString &source, int zoom, const QPoint &tp);
