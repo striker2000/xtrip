@@ -107,6 +107,7 @@ void TilesLoaderThread::run()
             continue;
         }
 
+        emit tilesLoading(m_tilesQueue.count());
         loadNextTile();
 
         exec();
@@ -139,6 +140,7 @@ void TilesLoaderThread::handleNetworkData(QNetworkReply *reply)
 
     reply->deleteLater();
 
+    emit tilesLoading(m_tilesQueue.count());
     loadNextTile();
 }
 

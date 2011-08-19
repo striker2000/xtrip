@@ -25,6 +25,7 @@ public:
 
 signals:
     void tileLoaded(QPoint tp);
+    void tilesLoading(int count);
 
 public slots:
     void handleNetworkData(QNetworkReply *reply);

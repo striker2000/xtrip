@@ -10,6 +10,7 @@ TilesMap::TilesMap(LatLon center, int zoom, QWidget *parent) :
     m_sources["osm"] = new OSMTilesSource();
     m_source = m_sources["osm"];
     connect(&m_loaderThread, SIGNAL(tileLoaded(QPoint)), SLOT(updateTile(QPoint)));
+    connect(&m_loaderThread, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
 }
 
 void TilesMap::setCenter(LatLon center)

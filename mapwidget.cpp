@@ -7,6 +7,7 @@ MapWidget::MapWidget(QWidget *parent) :
 {
     m_tiles = new TilesMap(m_center, m_zoom, this);
     connect(m_tiles, SIGNAL(updated(QRect)), SLOT(updateMap(QRect)));
+    connect(m_tiles, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
     m_lockWheel = false;
 }
 

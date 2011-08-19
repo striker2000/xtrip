@@ -19,6 +19,7 @@ public:
 
 signals:
     void zoomChanged(int zoom);
+    void tilesLoading(int count);
 
 private slots:
     void updateMap(const QRect &r);

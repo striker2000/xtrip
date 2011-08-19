@@ -27,6 +27,7 @@ public:
 
 signals:
     void updated(const QRect &rect);
+    void tilesLoading(int count);
 
 public slots:
     void updateTile(QPoint tp);

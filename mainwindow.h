@@ -16,10 +16,12 @@ public:
 
 private slots:
     void setZoomLabel(int zoom);
+    void setLoadingLabel(int count);
 
 private:
     MapWidget *m_map;
     QLabel *m_zoomLabel;
+    QLabel *m_loadingLabel;
 };
 
 #endif // MAINWINDOW_H
