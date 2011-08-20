@@ -6,7 +6,10 @@ SOURCES += \
     mapwidget.cpp \
     latlon.cpp \
     tilesmap.cpp \
-    tilesloaderthread.cpp
+    tilesloaderthread.cpp \
+    overlays.cpp \
+    point.cpp \
+    pointmarker.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -15,4 +18,7 @@ HEADERS += \
     tilesmap.h \
     tilessource.h \
     osmtilessource.h \
-    tilesloaderthread.h
+    tilesloaderthread.h \
+    overlays.h \
+    point.h \
+    pointmarker.h

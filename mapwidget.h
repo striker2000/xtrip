@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QWidget>
 
+#include "overlays.h"
 #include "tilesmap.h"
 
 class MapWidget : public QWidget
@@ -45,6 +46,7 @@ protected:
 
 private:
     TilesMap *m_tiles;
+    Overlays *m_overlays;
     LatLon m_center;
     int m_zoom;
     QPoint m_pressPos;

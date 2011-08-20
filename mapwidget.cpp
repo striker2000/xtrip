@@ -11,6 +11,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(m_tiles, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
     connect(m_tiles, SIGNAL(zoomChanged(int)), SIGNAL(zoomChanged(int)));
 
+    m_overlays = new Overlays(m_center, m_zoom, this);
+
     QShortcut *sc;
     sc = new QShortcut(QKeySequence("Left"), this);
     connect(sc, SIGNAL(activated()), SLOT(panLeft()));
@@ -34,7 +36,8 @@ MapWidget::MapWidget(QWidget *parent) :
 
 void MapWidget::resizeEvent(QResizeEvent *event)
 {
-    m_tiles->resize(width(), height());
+    m_tiles->resize(size());
+    m_overlays->resize(size());
 }
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
@@ -51,6 +54,7 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
     m_center = pointToLatLon(ct);
 
     m_tiles->setCenter(m_center);
+    m_overlays->setCenter(m_center);
 
     update();
 }
@@ -75,6 +79,8 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         m_center = pointToLatLon(latLonToPoint(pos) - delta);
         m_tiles->setCenter(m_center);
         m_tiles->loadTiles();
+        m_overlays->setZoom(m_zoom);
+        m_overlays->setCenter(m_center);
         update();
     }
 
