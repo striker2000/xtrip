@@ -143,6 +143,9 @@ void TilesLoaderThread::handleNetworkData(QNetworkReply *reply)
             emit tileLoaded(tp);
         }
     }
+    else {
+        qDebug() << reply->errorString();
+    }
 
     reply->deleteLater();
 

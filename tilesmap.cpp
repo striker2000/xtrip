@@ -31,7 +31,6 @@ int TilesMap::setZoom(int zoom)
         m_zoom = zoom;
         emit zoomChanged(m_zoom);
         calcTilesRect();
-        loadTiles();
     }
     return m_zoom;
 }
@@ -121,9 +120,10 @@ void TilesMap::calcTilesRect()
 
 void TilesMap::loadTiles()
 {
+    QRect rect = m_tilesRect.intersected(QRect(0, 0, 1 << m_zoom, 1 << m_zoom));
     m_loaderThread.loadTiles(
                 m_source,
-                m_tilesRect,
+                rect,
                 m_zoom
                 );
 }

@@ -29,14 +29,23 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
+    int newZoom;
     switch (event->key()) {
         case Qt::Key_PageUp:
-            m_zoom = m_tiles->setZoom(m_zoom + 1);
-            update();
+            newZoom = m_tiles->setZoom(m_zoom + 1);
+            if (newZoom != m_zoom) {
+                m_zoom = newZoom;
+                m_tiles->loadTiles();
+                update();
+            }
             break;
         case Qt::Key_PageDown:
-            m_zoom = m_tiles->setZoom(m_zoom - 1);
-            update();
+            newZoom = m_tiles->setZoom(m_zoom - 1);
+            if (newZoom != m_zoom) {
+                m_zoom = newZoom;
+                m_tiles->loadTiles();
+                update();
+            }
             break;
         case Qt::Key_O:
             m_tiles->setSource("osm");
@@ -75,13 +84,16 @@ void MapWidget::wheelEvent(QWheelEvent *event)
         return;
     }
 
-    QPoint delta = event->pos() - QPoint(width() / 2, height() / 2);
-    LatLon pos = pointToLatLon(latLonToPoint(m_center) + delta);
-    m_zoom += event->delta() / 120;
-    m_center = pointToLatLon(latLonToPoint(pos) - delta);
-    m_tiles->setCenter(m_center);
-    m_zoom = m_tiles->setZoom(m_zoom);
-    update();
+    int newZoom = m_tiles->setZoom(m_zoom + event->delta() / 120);
+    if (newZoom != m_zoom) {
+        QPoint delta = event->pos() - QPoint(width() / 2, height() / 2);
+        LatLon pos = pointToLatLon(latLonToPoint(m_center) + delta);
+        m_zoom = newZoom;
+        m_center = pointToLatLon(latLonToPoint(pos) - delta);
+        m_tiles->setCenter(m_center);
+        m_tiles->loadTiles();
+        update();
+    }
 
     m_lockWheel = true;
     QTimer::singleShot(100, this, SLOT(unlockWheel()));
