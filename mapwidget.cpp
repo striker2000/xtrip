@@ -3,67 +3,38 @@
 MapWidget::MapWidget(QWidget *parent) :
     QWidget(parent),
     m_center(55.755831, 37.617673),
-    m_zoom(10)
+    m_zoom(10),
+    m_lockWheel(false)
 {
     m_tiles = new TilesMap(m_center, m_zoom, this);
     connect(m_tiles, SIGNAL(updated(QRect)), SLOT(updateMap(QRect)));
     connect(m_tiles, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
     connect(m_tiles, SIGNAL(zoomChanged(int)), SIGNAL(zoomChanged(int)));
-    m_lockWheel = false;
-}
 
-int MapWidget::zoom()
-{
-    return m_zoom;
-}
-
-void MapWidget::updateMap(const QRect &r)
-{
-    update(r);
+    QShortcut *sc;
+    sc = new QShortcut(QKeySequence("Left"), this);
+    connect(sc, SIGNAL(activated()), SLOT(panLeft()));
+    sc = new QShortcut(QKeySequence("Right"), this);
+    connect(sc, SIGNAL(activated()), SLOT(panRight()));
+    sc = new QShortcut(QKeySequence("Down"), this);
+    connect(sc, SIGNAL(activated()), SLOT(panDown()));
+    sc = new QShortcut(QKeySequence("Up"), this);
+    connect(sc, SIGNAL(activated()), SLOT(panUp()));
+    sc = new QShortcut(QKeySequence("PgUp"), this);
+    connect(sc, SIGNAL(activated()), SLOT(zoomIn()));
+    sc = new QShortcut(QKeySequence("PgDown"), this);
+    connect(sc, SIGNAL(activated()), SLOT(zoomOut()));
+    sc = new QShortcut(QKeySequence("Alt+O, Alt+O"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openInOSM()));
+    sc = new QShortcut(QKeySequence("Alt+O, Alt+G"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openInGoogleMaps()));
+    sc = new QShortcut(QKeySequence("Alt+O, Alt+Y"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openInYandexMaps()));
 }
 
 void MapWidget::resizeEvent(QResizeEvent *event)
 {
     m_tiles->resize(width(), height());
-}
-
-void MapWidget::keyPressEvent(QKeyEvent *event)
-{
-    int newZoom;
-    switch (event->key()) {
-        case Qt::Key_Left:
-            pan(QPoint(-100, 0));
-            break;
-        case Qt::Key_Right:
-            pan(QPoint(100, 0));
-            break;
-        case Qt::Key_Down:
-            pan(QPoint(0, 100));
-            break;
-        case Qt::Key_Up:
-            pan(QPoint(0, -100));
-            break;
-        case Qt::Key_PageUp:
-            newZoom = m_tiles->setZoom(m_zoom + 1);
-            if (newZoom != m_zoom) {
-                m_zoom = newZoom;
-                m_tiles->loadTiles();
-                update();
-            }
-            break;
-        case Qt::Key_PageDown:
-            newZoom = m_tiles->setZoom(m_zoom - 1);
-            if (newZoom != m_zoom) {
-                m_zoom = newZoom;
-                m_tiles->loadTiles();
-                update();
-            }
-            break;
-        case Qt::Key_O:
-            m_tiles->setSource("osm");
-            update();
-            break;
-    }
 }
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
@@ -111,9 +82,51 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     QTimer::singleShot(100, this, SLOT(unlockWheel()));
 }
 
-void MapWidget::unlockWheel()
+void MapWidget::zoomIn()
 {
-    m_lockWheel = false;
+    int newZoom = m_tiles->setZoom(m_zoom + 1);
+    if (newZoom != m_zoom) {
+        m_zoom = newZoom;
+        m_tiles->loadTiles();
+        update();
+    }
+}
+
+void MapWidget::zoomOut()
+{
+    int newZoom = m_tiles->setZoom(m_zoom - 1);
+    if (newZoom != m_zoom) {
+        m_zoom = newZoom;
+        m_tiles->loadTiles();
+        update();
+    }
+}
+
+void MapWidget::openInOSM()
+{
+    QDesktopServices::openUrl(QUrl(
+        QString("http://www.openstreetmap.org/?lat=%1&lon=%2&zoom=%3&layers=M")
+            .arg(m_center.lat())
+            .arg(m_center.lon())
+            .arg(m_zoom)));
+}
+
+void MapWidget::openInGoogleMaps()
+{
+    QDesktopServices::openUrl(QUrl(
+        QString("http://maps.google.com/?ll=%1,%2&z=%3&t=m")
+            .arg(m_center.lat())
+            .arg(m_center.lon())
+            .arg(m_zoom)));
+}
+
+void MapWidget::openInYandexMaps()
+{
+    QDesktopServices::openUrl(QUrl(
+        QString("http://maps.yandex.ru/?ll=%2,%1&z=%3&l=map")
+            .arg(m_center.lat())
+            .arg(m_center.lon())
+            .arg(m_zoom)));
 }
 
 void MapWidget::pan(const QPoint &delta)

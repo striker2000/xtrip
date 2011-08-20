@@ -2,8 +2,10 @@
 #define MAPWIDGET_H
 
 #include <math.h>
+#include <QDesktopServices>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QShortcut>
 #include <QTimer>
 #include <QWidget>
 
@@ -15,19 +17,27 @@ class MapWidget : public QWidget
 
 public:
     explicit MapWidget(QWidget *parent = 0);
-    int zoom();
+    int zoom() { return m_zoom; }
 
 signals:
     void zoomChanged(int zoom);
     void tilesLoading(int count);
 
 private slots:
-    void updateMap(const QRect &r);
-    void unlockWheel();
+    void updateMap(const QRect &r) { update(r); }
+    void unlockWheel() { m_lockWheel = false; }
+    void panLeft() { pan(QPoint(-100, 0)); }
+    void panRight() { pan(QPoint(100, 0)); }
+    void panDown() { pan(QPoint(0, 100)); }
+    void panUp() { pan(QPoint(0, -100)); }
+    void zoomIn();
+    void zoomOut();
+    void openInOSM();
+    void openInGoogleMaps();
+    void openInYandexMaps();
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
