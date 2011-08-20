@@ -140,6 +140,7 @@ void MapWidget::pan(const QPoint &delta)
     m_center = pointToLatLon(latLonToPoint(m_center) + delta);
     m_tiles->setCenter(m_center);
     m_tiles->loadTiles();
+    m_overlays->setCenter(m_center);
     update();
 }
 
