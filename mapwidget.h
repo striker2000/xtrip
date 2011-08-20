@@ -41,6 +41,7 @@ private:
     QPoint m_movePos;
     bool m_lockWheel;
 
+    void pan(const QPoint &delta);
     QPointF latLonToPoint(LatLon latlon);
     LatLon pointToLatLon(QPointF point);
 };

@@ -31,6 +31,18 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
 {
     int newZoom;
     switch (event->key()) {
+        case Qt::Key_Left:
+            pan(QPoint(-100, 0));
+            break;
+        case Qt::Key_Right:
+            pan(QPoint(100, 0));
+            break;
+        case Qt::Key_Down:
+            pan(QPoint(0, 100));
+            break;
+        case Qt::Key_Up:
+            pan(QPoint(0, -100));
+            break;
         case Qt::Key_PageUp:
             newZoom = m_tiles->setZoom(m_zoom + 1);
             if (newZoom != m_zoom) {
@@ -102,6 +114,14 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 void MapWidget::unlockWheel()
 {
     m_lockWheel = false;
+}
+
+void MapWidget::pan(const QPoint &delta)
+{
+    m_center = pointToLatLon(latLonToPoint(m_center) + delta);
+    m_tiles->setCenter(m_center);
+    m_tiles->loadTiles();
+    update();
 }
 
 QPointF MapWidget::latLonToPoint(LatLon latlon)
