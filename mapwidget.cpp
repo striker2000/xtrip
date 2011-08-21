@@ -94,6 +94,7 @@ void MapWidget::zoomIn()
     if (newZoom != m_zoom) {
         m_zoom = newZoom;
         m_tiles->loadTiles();
+        m_overlays->setZoom(m_zoom);
         update();
     }
 }
@@ -104,6 +105,7 @@ void MapWidget::zoomOut()
     if (newZoom != m_zoom) {
         m_zoom = newZoom;
         m_tiles->loadTiles();
+        m_overlays->setZoom(m_zoom);
         update();
     }
 }
