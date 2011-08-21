@@ -5,6 +5,7 @@ Overlays::Overlays(LatLon center, int zoom, QWidget *parent) :
     m_center(center),
     m_zoom(zoom)
 {
+    m_cursor = new Cursor(this);
     loadPoints();
 }
 
@@ -20,6 +21,30 @@ void Overlays::setZoom(int zoom)
     movePoints();
 }
 
+void Overlays::showCursor(const LatLon &coord)
+{
+    m_cursor->setCoord(coord);
+    QPoint center(width() / 2, height() / 2);
+    QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
+    m_cursor->move(center + delta + QPoint(-15, -15));
+    m_cursor->show();
+}
+
+void Overlays::hideCursor()
+{
+    m_cursor->hide();
+}
+
+void Overlays::addPoint(const LatLon &coord, const QString &label)
+{
+    Point *p = new Point(coord, label, this);
+    m_points.append(p);
+    QPoint center(width() / 2, height() / 2);
+    QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
+    p->move(center + delta + QPoint(-5, -5));
+    p->show();
+}
+
 void Overlays::resizeEvent(QResizeEvent *event)
 {
     movePoints();
@@ -28,6 +53,8 @@ void Overlays::resizeEvent(QResizeEvent *event)
 void Overlays::movePoints()
 {
     QPoint center(width() / 2, height() / 2);
+    QPoint delta = (latLonToPoint(m_cursor->coord()) - latLonToPoint(m_center)).toPoint();
+    m_cursor->move(center + delta + QPoint(-15, -15));
     foreach (Point *p, m_points) {
         QPoint delta = (latLonToPoint(p->coord()) - latLonToPoint(m_center)).toPoint();
         p->move(center + delta + QPoint(-5, -5));

@@ -13,6 +13,9 @@ MapWidget::MapWidget(QWidget *parent) :
 
     m_overlays = new Overlays(m_center, m_zoom, this);
 
+    m_pointDialog = new PointDialog(this);
+    connect(m_pointDialog, SIGNAL(accepted()), SLOT(addPoint()));
+
     QShortcut *sc;
     sc = new QShortcut(QKeySequence("Left"), this);
     connect(sc, SIGNAL(activated()), SLOT(panLeft()));
@@ -26,6 +29,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(zoomIn()));
     sc = new QShortcut(QKeySequence("PgDown"), this);
     connect(sc, SIGNAL(activated()), SLOT(zoomOut()));
+    sc = new QShortcut(QKeySequence("Insert"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openPointDialog()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+O"), this);
     connect(sc, SIGNAL(activated()), SLOT(openInOSM()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+G"), this);
@@ -61,6 +66,10 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (event->pos() == m_pressPos) {
+        QPoint delta = m_pressPos - QPoint(width() / 2, height() / 2);
+        m_overlays->showCursor(pointToLatLon(latLonToPoint(m_center) + delta));
+    }
     update();
     m_tiles->loadTiles();
 }
@@ -108,6 +117,39 @@ void MapWidget::zoomOut()
         m_overlays->setZoom(m_zoom);
         update();
     }
+}
+
+void MapWidget::openPointDialog()
+{
+    if (m_overlays->isCursorVisible()) {
+        QLineEdit *edit;
+        edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
+        edit->setText(QString("%1").arg(m_overlays->cursor().lat()));
+        edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
+        edit->setText(QString("%1").arg(m_overlays->cursor().lon()));
+        edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
+        edit->setText("");
+        edit->setFocus();
+
+        m_pointDialog->open();
+    }
+}
+
+void MapWidget::addPoint()
+{
+    QLineEdit *edit;
+    qreal lat, lon;
+    QString label;
+    edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
+    lat = edit->text().toDouble();
+    edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
+    lon = edit->text().toDouble();
+    edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
+    label = edit->text();
+    LatLon coord(lat, lon);
+
+    m_overlays->addPoint(coord, label);
+    m_overlays->hideCursor();
 }
 
 void MapWidget::openInOSM()

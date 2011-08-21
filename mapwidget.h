@@ -4,12 +4,14 @@
 #include <math.h>
 #include <QDesktopServices>
 #include <QKeyEvent>
+#include <QLineEdit>
 #include <QMouseEvent>
 #include <QShortcut>
 #include <QTimer>
 #include <QWidget>
 
 #include "overlays.h"
+#include "pointdialog.h"
 #include "tilesmap.h"
 
 class MapWidget : public QWidget
@@ -33,6 +35,8 @@ private slots:
     void panUp() { pan(QPoint(0, -100)); }
     void zoomIn();
     void zoomOut();
+    void openPointDialog();
+    void addPoint();
     void openInOSM();
     void openInGoogleMaps();
     void openInYandexMaps();
@@ -52,6 +56,7 @@ private:
     QPoint m_pressPos;
     QPoint m_movePos;
     bool m_lockWheel;
+    PointDialog *m_pointDialog;
 
     void pan(const QPoint &delta);
     QPointF latLonToPoint(LatLon latlon);

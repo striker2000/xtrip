@@ -9,7 +9,9 @@ SOURCES += \
     tilesloaderthread.cpp \
     overlays.cpp \
     point.cpp \
-    pointmarker.cpp
+    pointmarker.cpp \
+    cursor.cpp \
+    pointdialog.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -21,4 +23,9 @@ HEADERS += \
     tilesloaderthread.h \
     overlays.h \
     point.h \
-    pointmarker.h
+    pointmarker.h \
+    cursor.h \
+    pointdialog.h
+
+FORMS += \
+    pointdialog.ui

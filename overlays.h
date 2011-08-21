@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QWidget>
 
+#include "cursor.h"
 #include "point.h"
 
 class Overlays : public QWidget
@@ -17,6 +18,11 @@ public:
     explicit Overlays(LatLon center, int zoom, QWidget *parent = 0);
     void setCenter(LatLon center);
     void setZoom(int zoom);
+    LatLon cursor() { return m_cursor->coord(); }
+    void showCursor(const LatLon &coord);
+    void hideCursor();
+    bool isCursorVisible() { return m_cursor->isVisible(); }
+    void addPoint(const LatLon &coord, const QString &name);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -24,6 +30,7 @@ protected:
 private:
     LatLon m_center;
     int m_zoom;
+    Cursor *m_cursor;
     QList<Point *> m_points;
 
     void movePoints();
