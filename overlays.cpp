@@ -48,6 +48,7 @@ void Overlays::addPoint(const LatLon &coord, const QString &label)
     QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
     p->move(center + delta + QPoint(-5, -5));
     p->show();
+    savePoints();
 }
 
 void Overlays::updateSelectedPoint(const LatLon &coord, const QString &name)
@@ -60,6 +61,7 @@ void Overlays::updateSelectedPoint(const LatLon &coord, const QString &name)
         m_selectedPoint->move(center + delta + QPoint(-5, -5));
         m_selectedPoint->deselect();
         m_selectedPoint = NULL;
+        savePoints();
     }
 }
 
@@ -69,6 +71,7 @@ void Overlays::deleteSelectedPoint()
         m_points.removeAll(m_selectedPoint);
         delete m_selectedPoint;
         m_selectedPoint = NULL;
+        savePoints();
     }
 }
 
@@ -115,6 +118,16 @@ void Overlays::loadPoints()
         m_points.append(p);
         connect(p, SIGNAL(selectionChanged(Point *, bool)), SLOT(pointSelectionChanged(Point *, bool)));
         p->show();
+    }
+    f.close();
+}
+
+void Overlays::savePoints() {
+    QFile f(QCoreApplication::applicationDirPath() + "/points.tsv");
+    f.open(QIODevice::WriteOnly);
+    QTextStream stream(&f);
+    foreach (Point *p, m_points) {
+        stream << p->coord().lat() << "\t" << p->coord().lon() << "\t" << p->label() << "\n";
     }
     f.close();
 }

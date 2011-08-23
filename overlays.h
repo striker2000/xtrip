@@ -42,6 +42,7 @@ private:
 
     void movePoints();
     void loadPoints();
+    void savePoints();
     QPointF latLonToPoint(LatLon latlon);
     LatLon pointToLatLon(QPointF point);
 };
