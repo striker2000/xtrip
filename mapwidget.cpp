@@ -33,6 +33,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(openAddPointDialog()));
     sc = new QShortcut(QKeySequence("E"), this);
     connect(sc, SIGNAL(activated()), SLOT(openEditPointDialog()));
+    sc = new QShortcut(QKeySequence("Delete"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openDeletePointDialog()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+O"), this);
     connect(sc, SIGNAL(activated()), SLOT(openInOSM()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+G"), this);
@@ -153,6 +155,20 @@ void MapWidget::openEditPointDialog()
 
         m_pointDialog->setWindowTitle("Edit Point");
         m_pointDialog->open();
+    }
+}
+
+void MapWidget::openDeletePointDialog()
+{
+    if (Point *p = m_overlays->selectedPoint()) {
+        QMessageBox msgBox(QMessageBox::Warning,
+                           "Delete Point",
+                           QString("Delete point \"%1\"?").arg(p->label()),
+                           QMessageBox::Ok | QMessageBox::Cancel);
+        int result = msgBox.exec();
+        if (result == QMessageBox::Ok) {
+            m_overlays->deleteSelectedPoint();
+        }
     }
 }
 

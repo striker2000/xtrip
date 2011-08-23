@@ -63,6 +63,15 @@ void Overlays::updateSelectedPoint(const LatLon &coord, const QString &name)
     }
 }
 
+void Overlays::deleteSelectedPoint()
+{
+    if (m_selectedPoint) {
+        m_points.removeAll(m_selectedPoint);
+        delete m_selectedPoint;
+        m_selectedPoint = NULL;
+    }
+}
+
 void Overlays::pointSelectionChanged(Point *point, bool selected)
 {
     if (selected) {

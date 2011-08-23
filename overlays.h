@@ -25,6 +25,7 @@ public:
     void addPoint(const LatLon &coord, const QString &name);
     Point *selectedPoint() { return m_selectedPoint; }
     void updateSelectedPoint(const LatLon &coord, const QString &name);
+    void deleteSelectedPoint();
 
 private slots:
     void pointSelectionChanged(Point *point, bool selected);

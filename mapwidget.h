@@ -5,6 +5,7 @@
 #include <QDesktopServices>
 #include <QKeyEvent>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QShortcut>
 #include <QTimer>
@@ -37,6 +38,7 @@ private slots:
     void zoomOut();
     void openAddPointDialog();
     void openEditPointDialog();
+    void openDeletePointDialog();
     void pointDialogAccepted();
     void openInOSM();
     void openInGoogleMaps();
