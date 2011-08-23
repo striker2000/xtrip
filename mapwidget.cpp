@@ -161,12 +161,11 @@ void MapWidget::openEditPointDialog()
 void MapWidget::openDeletePointDialog()
 {
     if (Point *p = m_overlays->selectedPoint()) {
-        QMessageBox msgBox(QMessageBox::Warning,
-                           "Delete Point",
-                           QString("Delete point \"%1\"?").arg(p->label()),
-                           QMessageBox::Ok | QMessageBox::Cancel);
-        int result = msgBox.exec();
-        if (result == QMessageBox::Ok) {
+        if (QMessageBox::Ok == QMessageBox::warning(
+                    this,
+                    "Delete Point",
+                    QString("Delete point \"%1\"?").arg(p->label()),
+                    QMessageBox::Ok | QMessageBox::Cancel)) {
             m_overlays->deleteSelectedPoint();
         }
     }
