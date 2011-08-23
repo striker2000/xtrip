@@ -14,6 +14,16 @@ class Point : public QWidget
 public:
     explicit Point(const LatLon &coord, const QString &label, QWidget *parent = 0);
     LatLon coord() { return m_coord; }
+    QString label() { return m_label->text(); }
+    void setCoord(const LatLon &coord) { m_coord = coord; }
+    void setLabel(const QString &label);
+    void deselect() { m_marker->deselect(); }
+
+signals:
+    void selectionChanged(Point *point, bool selected);
+
+private slots:
+    void selectionChanged(bool selected);
 
 private:
     PointMarker *m_marker;

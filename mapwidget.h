@@ -35,8 +35,9 @@ private slots:
     void panUp() { pan(QPoint(0, -100)); }
     void zoomIn();
     void zoomOut();
-    void openPointDialog();
-    void addPoint();
+    void openAddPointDialog();
+    void openEditPointDialog();
+    void pointDialogAccepted();
     void openInOSM();
     void openInGoogleMaps();
     void openInYandexMaps();

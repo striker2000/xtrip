@@ -26,8 +26,12 @@ void Overlays::showCursor(const LatLon &coord)
     m_cursor->setCoord(coord);
     QPoint center(width() / 2, height() / 2);
     QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
-    m_cursor->move(center + delta + QPoint(-15, -15));
+    m_cursor->move(center + delta + QPoint(-7, -7));
     m_cursor->show();
+    if (m_selectedPoint) {
+        m_selectedPoint->deselect();
+        m_selectedPoint = NULL;
+    }
 }
 
 void Overlays::hideCursor()
@@ -39,10 +43,38 @@ void Overlays::addPoint(const LatLon &coord, const QString &label)
 {
     Point *p = new Point(coord, label, this);
     m_points.append(p);
+    connect(p, SIGNAL(selectionChanged(Point *, bool)), SLOT(pointSelectionChanged(Point *, bool)));
     QPoint center(width() / 2, height() / 2);
     QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
     p->move(center + delta + QPoint(-5, -5));
     p->show();
+}
+
+void Overlays::updateSelectedPoint(const LatLon &coord, const QString &name)
+{
+    if (m_selectedPoint) {
+        m_selectedPoint->setCoord(coord);
+        m_selectedPoint->setLabel(name);
+        QPoint center(width() / 2, height() / 2);
+        QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
+        m_selectedPoint->move(center + delta + QPoint(-5, -5));
+        m_selectedPoint->deselect();
+        m_selectedPoint = NULL;
+    }
+}
+
+void Overlays::pointSelectionChanged(Point *point, bool selected)
+{
+    if (selected) {
+        if (m_selectedPoint) {
+            m_selectedPoint->deselect();
+        }
+        m_selectedPoint = point;
+        m_cursor->hide();
+    }
+    else {
+        m_selectedPoint = NULL;
+    }
 }
 
 void Overlays::resizeEvent(QResizeEvent *event)
@@ -54,7 +86,7 @@ void Overlays::movePoints()
 {
     QPoint center(width() / 2, height() / 2);
     QPoint delta = (latLonToPoint(m_cursor->coord()) - latLonToPoint(m_center)).toPoint();
-    m_cursor->move(center + delta + QPoint(-15, -15));
+    m_cursor->move(center + delta + QPoint(-7, -7));
     foreach (Point *p, m_points) {
         QPoint delta = (latLonToPoint(p->coord()) - latLonToPoint(m_center)).toPoint();
         p->move(center + delta + QPoint(-5, -5));
@@ -72,6 +104,7 @@ void Overlays::loadPoints()
         QStringList l = s.split("\t");
         Point *p = new Point(LatLon(l.at(0).toDouble(), l.at(1).toDouble()), l.at(2), this);
         m_points.append(p);
+        connect(p, SIGNAL(selectionChanged(Point *, bool)), SLOT(pointSelectionChanged(Point *, bool)));
         p->show();
     }
     f.close();

@@ -23,6 +23,11 @@ public:
     void hideCursor();
     bool isCursorVisible() { return m_cursor->isVisible(); }
     void addPoint(const LatLon &coord, const QString &name);
+    Point *selectedPoint() { return m_selectedPoint; }
+    void updateSelectedPoint(const LatLon &coord, const QString &name);
+
+private slots:
+    void pointSelectionChanged(Point *point, bool selected);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -32,6 +37,7 @@ private:
     int m_zoom;
     Cursor *m_cursor;
     QList<Point *> m_points;
+    Point *m_selectedPoint;
 
     void movePoints();
     void loadPoints();
