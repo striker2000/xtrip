@@ -128,9 +128,9 @@ void MapWidget::openAddPointDialog()
     if (m_overlays->isCursorVisible()) {
         QLineEdit *edit;
         edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
-        edit->setText(QString("%1").arg(m_overlays->cursor().lat()));
+        edit->setText(QString().setNum(m_overlays->cursor().lat(), 'f', 6));
         edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
-        edit->setText(QString("%1").arg(m_overlays->cursor().lon()));
+        edit->setText(QString().setNum(m_overlays->cursor().lon(), 'f', 6));
         edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
         edit->setText("");
         edit->setFocus();
@@ -145,9 +145,9 @@ void MapWidget::openEditPointDialog()
     if (Point *p = m_overlays->selectedPoint()) {
         QLineEdit *edit;
         edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
-        edit->setText(QString("%1").arg(p->coord().lat()));
+        edit->setText(QString().setNum(p->coord().lat(), 'f', 6));
         edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
-        edit->setText(QString("%1").arg(p->coord().lon()));
+        edit->setText(QString().setNum(p->coord().lon(), 'f', 6));
         edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
         edit->setText(p->label());
         edit->selectAll();
