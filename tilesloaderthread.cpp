@@ -20,12 +20,13 @@ TilesLoaderThread::~TilesLoaderThread()
     wait();
 }
 
-void TilesLoaderThread::loadTiles(TilesSource *source, const QRect &bounds, int zoom)
+void TilesLoaderThread::loadTiles(TilesSource *source, const QRect &bounds, int zoom, bool online)
 {
     m_mutex.lock();
     m_source = source;
     m_bounds = bounds;
     m_zoom = zoom;
+    m_online = online;
     m_tilesQueue.clear();
     m_restart = true;
     m_mutex.unlock();
@@ -48,6 +49,7 @@ void TilesLoaderThread::run()
         TilesSource *source = m_source;
         QRect bounds = m_bounds;
         int zoom = m_zoom;
+        bool online = m_online;
         m_restart = false;
         m_mutex.unlock();
 
@@ -71,6 +73,10 @@ void TilesLoaderThread::run()
 
         QDateTime expiration = QDateTime::currentDateTime().addDays(-m_tileLifetime);
         foreach (QPoint tp, tiles) {
+            if (m_restart) {
+                break;
+            }
+
             QFile file(tilePath(source->dirname(), zoom, tp, source->format()));
             if (file.open(QIODevice::ReadOnly)) {
                 QByteArray buf = file.readAll();
@@ -88,21 +94,19 @@ void TilesLoaderThread::run()
                 }
             }
 
-            QUrl url = QUrl(source->tileUrl(tp.x(), tp.y(), zoom));
-            QNetworkRequest request;
-            request.setUrl(url);
-            QHash<QString, QVariant> data;
-            data["tp"] = tp;
-            data["key"] = key.sprintf("tile.%d.%d.%d.%d", source->id(), zoom, tp.x(), tp.y());
-            data["dirname"] = dirPath(source->dirname(), zoom, tp);
-            data["filename"] = tilePath(source->dirname(), zoom, tp, source->format());
-            request.setAttribute(QNetworkRequest::User, QVariant(data));
-            m_mutex.lock();
-            m_tilesQueue.enqueue(request);
-            m_mutex.unlock();
-
-            if (m_restart) {
-                break;
+            if (online) {
+                QUrl url = QUrl(source->tileUrl(tp.x(), tp.y(), zoom));
+                QNetworkRequest request;
+                request.setUrl(url);
+                QHash<QString, QVariant> data;
+                data["tp"] = tp;
+                data["key"] = key.sprintf("tile.%d.%d.%d.%d", source->id(), zoom, tp.x(), tp.y());
+                data["dirname"] = dirPath(source->dirname(), zoom, tp);
+                data["filename"] = tilePath(source->dirname(), zoom, tp, source->format());
+                request.setAttribute(QNetworkRequest::User, QVariant(data));
+                m_mutex.lock();
+                m_tilesQueue.enqueue(request);
+                m_mutex.unlock();
             }
         }
 
@@ -110,8 +114,10 @@ void TilesLoaderThread::run()
             continue;
         }
 
-        emit tilesLoading(m_tilesQueue.count());
-        loadNextTile();
+        if (online) {
+            emit tilesLoading(m_tilesQueue.count());
+            loadNextTile();
+        }
 
         exec();
     }

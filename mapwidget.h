@@ -22,10 +22,12 @@ class MapWidget : public QWidget
 public:
     explicit MapWidget(QWidget *parent = 0);
     int zoom() { return m_zoom; }
+    bool online() { return m_online; }
 
 signals:
     void zoomChanged(int zoom);
     void tilesLoading(int count);
+    void onlineSwitched(bool online);
 
 private slots:
     void updateMap(const QRect &r) { update(r); }
@@ -41,6 +43,7 @@ private slots:
     void openEditPointDialog();
     void openDeletePointDialog();
     void pointDialogAccepted();
+    void switchOnline();
     void openInOSM();
     void openInGoogleMaps();
     void openInYandexMaps();
@@ -57,6 +60,7 @@ private:
     Overlays *m_overlays;
     LatLon m_center;
     int m_zoom;
+    bool m_online;
     QPoint m_pressPos;
     QPoint m_movePos;
     bool m_lockWheel;

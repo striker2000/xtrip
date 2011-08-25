@@ -1,9 +1,10 @@
 #include "tilesmap.h"
 
-TilesMap::TilesMap(LatLon center, int zoom, QWidget *parent) :
+TilesMap::TilesMap(LatLon center, int zoom, bool online, QWidget *parent) :
     QWidget(parent),
     m_center(center),
-    m_zoom(zoom)
+    m_zoom(zoom),
+    m_online(online)
 {
     m_emptyTile = QPixmap(TILE_SIZE, TILE_SIZE);
     m_emptyTile.fill(Qt::lightGray);
@@ -43,6 +44,12 @@ void TilesMap::setSource(QString source)
     else {
         m_source = m_sources["osm"];
     }
+    loadTiles();
+}
+
+void TilesMap::setOnline(bool online)
+{
+    m_online = online;
     loadTiles();
 }
 
@@ -122,7 +129,8 @@ void TilesMap::loadTiles()
     m_loaderThread.loadTiles(
                 m_source,
                 rect,
-                m_zoom
+                m_zoom,
+                m_online
                 );
 }
 

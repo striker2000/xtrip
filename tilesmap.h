@@ -19,10 +19,11 @@ class TilesMap : public QWidget
     Q_OBJECT
 
 public:
-    explicit TilesMap(LatLon center, int zoom, QWidget *parent = 0);
+    explicit TilesMap(LatLon center, int zoom, bool online, QWidget *parent = 0);
     void setCenter(LatLon center);
     int setZoom(int zoom);
     void setSource(QString source);
+    void setOnline(bool online);
     void loadTiles();
 
 signals:
@@ -42,6 +43,7 @@ private:
     int m_height;
     LatLon m_center;
     int m_zoom;
+    bool m_online;
     QPoint m_tileCenter;
     QPoint m_offset;
     QRect m_tilesRect;

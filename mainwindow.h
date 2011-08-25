@@ -16,11 +16,13 @@ public:
 
 private slots:
     void setZoomLabel(int zoom);
+    void setOnlineLabel(bool online);
     void setLoadingLabel(int count);
 
 private:
     MapWidget *m_map;
     QLabel *m_zoomLabel;
+    QLabel *m_onlineLabel;
     QLabel *m_loadingLabel;
 };
 

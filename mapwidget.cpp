@@ -4,9 +4,10 @@ MapWidget::MapWidget(QWidget *parent) :
     QWidget(parent),
     m_center(55.755831, 37.617673),
     m_zoom(10),
+    m_online(true),
     m_lockWheel(false)
 {
-    m_tiles = new TilesMap(m_center, m_zoom, this);
+    m_tiles = new TilesMap(m_center, m_zoom, m_online, this);
     connect(m_tiles, SIGNAL(updated(QRect)), SLOT(updateMap(QRect)));
     connect(m_tiles, SIGNAL(tilesLoading(int)), SIGNAL(tilesLoading(int)));
     connect(m_tiles, SIGNAL(zoomChanged(int)), SIGNAL(zoomChanged(int)));
@@ -37,6 +38,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(openEditPointDialog()));
     sc = new QShortcut(QKeySequence("Delete"), this);
     connect(sc, SIGNAL(activated()), SLOT(openDeletePointDialog()));
+    sc = new QShortcut(QKeySequence("Alt+I"), this);
+    connect(sc, SIGNAL(activated()), SLOT(switchOnline()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+O"), this);
     connect(sc, SIGNAL(activated()), SLOT(openInOSM()));
     sc = new QShortcut(QKeySequence("Alt+O, Alt+G"), this);
@@ -197,6 +200,13 @@ void MapWidget::pointDialogAccepted()
         m_overlays->addPoint(coord, label);
         m_overlays->hideCursor();
     }
+}
+
+void MapWidget::switchOnline()
+{
+    m_online = !m_online;
+    m_tiles->setOnline(m_online);
+    emit onlineSwitched(m_online);
 }
 
 void MapWidget::openInOSM()

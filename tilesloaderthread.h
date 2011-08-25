@@ -23,7 +23,7 @@ class TilesLoaderThread : public QThread
 public:
     explicit TilesLoaderThread(QObject *parent = 0);
     ~TilesLoaderThread();
-    void loadTiles(TilesSource *source, const QRect &bounds, int zoom);
+    void loadTiles(TilesSource *source, const QRect &bounds, int zoom, bool online);
 
 signals:
     void tileLoaded(QPoint tp);
@@ -43,6 +43,7 @@ private:
     TilesSource *m_source;
     QRect m_bounds;
     int m_zoom;
+    bool m_online;
     QNetworkAccessManager *m_manager;
     QUrl m_url;
     QList<QNetworkReply *> m_replies;
