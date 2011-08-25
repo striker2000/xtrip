@@ -136,7 +136,9 @@ void Overlays::savePoints() {
     f.open(QIODevice::WriteOnly);
     QTextStream stream(&f);
     foreach (Point *p, m_points) {
-        stream << p->coord().lat() << "\t" << p->coord().lon() << "\t" << p->label() << "\n";
+        stream << QString().setNum(p->coord().lat(), 'f', 6) << "\t"
+               << QString().setNum(p->coord().lon(), 'f', 6) << "\t"
+               << p->label() << "\n";
     }
     f.close();
 }
