@@ -36,6 +36,7 @@ private slots:
     void panUp() { pan(QPoint(0, -100)); }
     void zoomIn();
     void zoomOut();
+    void hideAll();
     void openAddPointDialog();
     void openEditPointDialog();
     void openDeletePointDialog();

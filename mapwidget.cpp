@@ -29,6 +29,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(zoomIn()));
     sc = new QShortcut(QKeySequence("PgDown"), this);
     connect(sc, SIGNAL(activated()), SLOT(zoomOut()));
+    sc = new QShortcut(QKeySequence("Escape"), this);
+    connect(sc, SIGNAL(activated()), SLOT(hideAll()));
     sc = new QShortcut(QKeySequence("Insert"), this);
     connect(sc, SIGNAL(activated()), SLOT(openAddPointDialog()));
     sc = new QShortcut(QKeySequence("E"), this);
@@ -121,6 +123,12 @@ void MapWidget::zoomOut()
         m_overlays->setZoom(m_zoom);
         update();
     }
+}
+
+void MapWidget::hideAll()
+{
+    m_overlays->hideCursor();
+    m_overlays->deselect();
 }
 
 void MapWidget::openAddPointDialog()

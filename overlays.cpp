@@ -76,6 +76,14 @@ void Overlays::deleteSelectedPoint()
     }
 }
 
+void Overlays::deselect()
+{
+    if (m_selectedPoint) {
+        m_selectedPoint->deselect();
+        m_selectedPoint = NULL;
+    }
+}
+
 void Overlays::pointSelectionChanged(Point *point, bool selected)
 {
     if (selected) {
