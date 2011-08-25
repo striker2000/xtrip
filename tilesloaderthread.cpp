@@ -1,12 +1,12 @@
 #include "tilesloaderthread.h"
 
 TilesLoaderThread::TilesLoaderThread(QObject *parent) :
-    QThread(parent)
+    QThread(parent),
+    m_abort(false)
 {
     QSettings settings(QCoreApplication::applicationDirPath() + "/xtrip.ini", QSettings::IniFormat);
     m_tilesPath = settings.value("TilesPath").toString();
     m_tileLifetime = settings.value("TileLifetime").toInt();
-    m_abort = false;
     start();
 }
 
@@ -57,8 +57,7 @@ void TilesLoaderThread::run()
         for (int x = bounds.left(); x <= bounds.right(); x++) {
             for (int y = bounds.top(); y <= bounds.bottom(); y++) {
                 QPoint tp(x, y);
-                key = QString("tile.%1.%2.%3.%4")
-                        .arg(source->id()).arg(zoom).arg(tp.x()).arg(tp.y());
+                key.sprintf("tile.%d.%d.%d.%d", source->id(), zoom, x, y);
                 if (!QPixmapCache::find(key)) {
                     QPoint p = tp - center;
                     tiles.insertMulti(p.x() * p.x() + p.y() * p.y(), tp);
@@ -78,8 +77,7 @@ void TilesLoaderThread::run()
                 file.close();
                 QPixmap tile;
                 if (tile.loadFromData(buf)) {
-                    key = QString("tile.%1.%2.%3.%4")
-                            .arg(source->id()).arg(zoom).arg(tp.x()).arg(tp.y());
+                    key.sprintf("tile.%d.%d.%d.%d", source->id(), zoom, tp.x(), tp.y());
                     if (QPixmapCache::insert(key, tile)) {
                         emit tileLoaded(tp);
                     }
@@ -95,8 +93,7 @@ void TilesLoaderThread::run()
             request.setUrl(url);
             QHash<QString, QVariant> data;
             data["tp"] = tp;
-            data["key"] = QString("tile.%1.%2.%3.%4")
-                    .arg(source->id()).arg(zoom).arg(tp.x()).arg(tp.y());
+            data["key"] = key.sprintf("tile.%d.%d.%d.%d", source->id(), zoom, tp.x(), tp.y());
             data["dirname"] = dirPath(source->dirname(), zoom, tp);
             data["filename"] = tilePath(source->dirname(), zoom, tp, source->format());
             request.setAttribute(QNetworkRequest::User, QVariant(data));

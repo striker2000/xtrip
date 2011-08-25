@@ -58,16 +58,14 @@ void TilesMap::paintEvent(QPaintEvent *event)
             QPoint tp(x, y);
             QRect box = tileRect(tp);
             if (event->rect().intersects(box)) {
-                key = QString("tile.%1.%2.%3.%4")
-                        .arg(m_source->id()).arg(m_zoom).arg(tp.x()).arg(tp.y());
+                key.sprintf("tile.%d.%d.%d.%d", m_source->id(), m_zoom, x, y);
                 if (QPixmapCache::find(key, tile)) {
                     p.drawPixmap(box, tile);
                 }
                 else {
                     bool drawn = false;
                     for (int k = 2, z = m_zoom - 1; k <= 8; k *= 2, z--) {
-                        key = QString("tile.%1.%2.%3.%4")
-                                .arg(m_source->id()).arg(z).arg(x / k).arg(y / k);
+                        key.sprintf("tile.%d.%d.%d.%d", m_source->id(), z, x / k, y / k);
                         if (QPixmapCache::find(key, tile)) {
                             int s = TILE_SIZE / k;
                             p.drawPixmap(box, tile, QRect((x % k) * s, (y % k) * s, s, s));
