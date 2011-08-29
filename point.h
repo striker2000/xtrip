@@ -21,14 +21,19 @@ public:
 
 signals:
     void selectionChanged(Point *point, bool selected);
+    void moved(Point *point, QPoint delta);
 
 private slots:
     void selectionChanged(bool selected);
+    void dragStarted();
+    void dragMove(QPoint delta);
+    void dragFinished();
 
 private:
     PointMarker *m_marker;
     QLabel *m_label;
     LatLon m_coord;
+    QPoint m_dragStartPos;
 };
 
 #endif // POINT_H

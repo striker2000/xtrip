@@ -45,6 +45,7 @@ void Overlays::addPoint(const LatLon &coord, const QString &label)
     Point *p = new Point(coord, label, this);
     m_points.append(p);
     connect(p, SIGNAL(selectionChanged(Point *, bool)), SLOT(pointSelectionChanged(Point *, bool)));
+    connect(p, SIGNAL(moved(Point *, QPoint)), SLOT(pointMoved(Point *, QPoint)));
     QPoint center(width() / 2, height() / 2);
     QPoint delta = (latLonToPoint(coord) - latLonToPoint(m_center)).toPoint();
     p->move(center + delta + QPoint(-5, -7));
@@ -98,6 +99,13 @@ void Overlays::pointSelectionChanged(Point *point, bool selected)
     }
 }
 
+void Overlays::pointMoved(Point *point, QPoint delta)
+{
+    point->setCoord(pointToLatLon(latLonToPoint(point->coord()) + delta));
+    deselect();
+    savePoints();
+}
+
 void Overlays::resizeEvent(QResizeEvent *event)
 {
     movePoints();
@@ -126,6 +134,7 @@ void Overlays::loadPoints()
         Point *p = new Point(LatLon(l.at(0).toDouble(), l.at(1).toDouble()), l.at(2), this);
         m_points.append(p);
         connect(p, SIGNAL(selectionChanged(Point *, bool)), SLOT(pointSelectionChanged(Point *, bool)));
+        connect(p, SIGNAL(moved(Point *, QPoint)), SLOT(pointMoved(Point *, QPoint)));
         p->show();
     }
     f.close();

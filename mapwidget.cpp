@@ -32,8 +32,6 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(zoomOut()));
     sc = new QShortcut(QKeySequence("Escape"), this);
     connect(sc, SIGNAL(activated()), SLOT(hideAll()));
-    sc = new QShortcut(QKeySequence("Insert"), this);
-    connect(sc, SIGNAL(activated()), SLOT(openAddPointDialog()));
     sc = new QShortcut(QKeySequence("E"), this);
     connect(sc, SIGNAL(activated()), SLOT(openEditPointDialog()));
     sc = new QShortcut(QKeySequence("Delete"), this);
@@ -56,7 +54,25 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
-    m_pressPos = m_movePos = event->pos();
+    if (event->button() == Qt::LeftButton) {
+        m_pressPos = m_movePos = event->pos();
+    }
+    else if (event->button() == Qt::RightButton) {
+        QPoint delta = event->pos() - QPoint(width() / 2, height() / 2);
+        LatLon coord = pointToLatLon(latLonToPoint(m_center) + delta);
+
+        QLineEdit *edit;
+        edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
+        edit->setText(QString().setNum(coord.lat(), 'f', 6));
+        edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
+        edit->setText(QString().setNum(coord.lon(), 'f', 6));
+        edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
+        edit->setText("");
+        edit->setFocus();
+
+        m_pointDialog->setWindowTitle("Add Point");
+        m_pointDialog->open();
+    }
 }
 
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
@@ -76,8 +92,7 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->pos() == m_pressPos) {
-        QPoint delta = m_pressPos - QPoint(width() / 2, height() / 2);
-        m_overlays->showCursor(pointToLatLon(latLonToPoint(m_center) + delta));
+        m_overlays->deselect();
     }
     update();
     m_tiles->loadTiles();
@@ -130,25 +145,7 @@ void MapWidget::zoomOut()
 
 void MapWidget::hideAll()
 {
-    m_overlays->hideCursor();
     m_overlays->deselect();
-}
-
-void MapWidget::openAddPointDialog()
-{
-    if (m_overlays->isCursorVisible()) {
-        QLineEdit *edit;
-        edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
-        edit->setText(QString().setNum(m_overlays->cursor().lat(), 'f', 6));
-        edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
-        edit->setText(QString().setNum(m_overlays->cursor().lon(), 'f', 6));
-        edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
-        edit->setText("");
-        edit->setFocus();
-
-        m_pointDialog->setWindowTitle("Add Point");
-        m_pointDialog->open();
-    }
 }
 
 void MapWidget::openEditPointDialog()
@@ -198,7 +195,6 @@ void MapWidget::pointDialogAccepted()
     }
     else {
         m_overlays->addPoint(coord, label);
-        m_overlays->hideCursor();
     }
 }
 

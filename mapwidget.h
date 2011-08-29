@@ -39,7 +39,6 @@ private slots:
     void zoomIn();
     void zoomOut();
     void hideAll();
-    void openAddPointDialog();
     void openEditPointDialog();
     void openDeletePointDialog();
     void pointDialogAccepted();

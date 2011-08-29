@@ -30,6 +30,7 @@ public:
 
 private slots:
     void pointSelectionChanged(Point *point, bool selected);
+    void pointMoved(Point *point, QPoint delta);
 
 protected:
     void resizeEvent(QResizeEvent *event);
