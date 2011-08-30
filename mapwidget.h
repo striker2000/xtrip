@@ -2,6 +2,8 @@
 #define MAPWIDGET_H
 
 #include <math.h>
+#include <QApplication>
+#include <QClipboard>
 #include <QDesktopServices>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -39,6 +41,7 @@ private slots:
     void zoomIn();
     void zoomOut();
     void hideAll();
+    void openAddPointDialog();
     void openEditPointDialog();
     void openDeletePointDialog();
     void pointDialogAccepted();

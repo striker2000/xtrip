@@ -32,6 +32,8 @@ MapWidget::MapWidget(QWidget *parent) :
     connect(sc, SIGNAL(activated()), SLOT(zoomOut()));
     sc = new QShortcut(QKeySequence("Escape"), this);
     connect(sc, SIGNAL(activated()), SLOT(hideAll()));
+    sc = new QShortcut(QKeySequence("Shift+Insert"), this);
+    connect(sc, SIGNAL(activated()), SLOT(openAddPointDialog()));
     sc = new QShortcut(QKeySequence("E"), this);
     connect(sc, SIGNAL(activated()), SLOT(openEditPointDialog()));
     sc = new QShortcut(QKeySequence("Delete"), this);
@@ -146,6 +148,24 @@ void MapWidget::zoomOut()
 void MapWidget::hideAll()
 {
     m_overlays->deselect();
+}
+
+void MapWidget::openAddPointDialog()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    LatLon coord(clipboard->text());
+
+    QLineEdit *edit;
+    edit = m_pointDialog->findChild<QLineEdit *>("latitudeEdit");
+    edit->setText(QString().setNum(coord.lat(), 'f', 6));
+    edit = m_pointDialog->findChild<QLineEdit *>("longitudeEdit");
+    edit->setText(QString().setNum(coord.lon(), 'f', 6));
+    edit = m_pointDialog->findChild<QLineEdit *>("nameEdit");
+    edit->setText("");
+    edit->setFocus();
+
+    m_pointDialog->setWindowTitle("Add Point");
+    m_pointDialog->open();
 }
 
 void MapWidget::openEditPointDialog()
